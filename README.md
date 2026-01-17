@@ -18,6 +18,8 @@ The idea is that the user provides only a **topic** and the system:
 
 <img src="assets/interface1.png" alt="Social Media Writer Interface" width="700"/>
 
+🔗 **[Try the Live Demo](https://ai-content-creator.streamlit.app)**
+
 ## 💡 The Problem It Solves
 
 Creating high-quality content takes time:
