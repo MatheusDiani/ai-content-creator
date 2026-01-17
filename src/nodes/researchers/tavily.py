@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from tavily import TavilyClient
 
 from src.llm import LLMClient
-from src.llm.client import get_secret
+from src.utils.env import get_secret
 from src.models.content import ResearchSummary
 from src.models.state import GraphState
 from src.utils.logger import get_logger

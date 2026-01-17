@@ -7,22 +7,11 @@ from typing import Optional
 from dotenv import load_dotenv
 from huggingface_hub import InferenceClient
 
+from src.utils.env import get_secret
 from src.utils.logger import get_logger
 
 load_dotenv()
 logger = get_logger(__name__)
-
-def get_secret(key: str, default: Optional[str] = None) -> str:
-    """Get secret from os.getenv or st.secrets."""
-    value = os.getenv(key)
-    if value:
-        return value
-    
-    try:
-        import streamlit as st
-        return st.secrets.get(key, default)
-    except (ImportError, FileNotFoundError):
-        return default or ""
 
 # Modelos padrão
 DEFAULT_MODEL = get_secret("MODEL_NAME", "meta-llama/Meta-Llama-3-8B-Instruct")

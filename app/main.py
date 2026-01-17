@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 
 from src.graph.workflow import stream_workflow
-from src.llm.client import get_secret
+from src.utils.env import get_secret
 from src.models.content import ContentOutput
 
 load_dotenv()
