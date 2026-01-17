@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from tavily import TavilyClient
 
 from src.llm import LLMClient
+from src.llm.client import get_secret
 from src.models.content import ResearchSummary
 from src.models.state import GraphState
 from src.utils.logger import get_logger
@@ -40,7 +41,7 @@ def tavily_researcher_node(state: GraphState) -> dict:
     topic = state.topic
     logger.info(f"Tavily researcher searching for: {topic}")
 
-    api_key = os.getenv("TAVILY_API_KEY", "")
+    api_key = get_secret("TAVILY_API_KEY", "")
 
     if not api_key:
         logger.error("TAVILY_API_KEY not set")

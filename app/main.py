@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 
 from src.graph.workflow import stream_workflow
+from src.llm.client import get_secret
 from src.models.content import ContentOutput
 
 load_dotenv()
@@ -59,13 +60,13 @@ def save_to_mongodb(content: ContentOutput, session_id: str, researchers: list[s
     Returns:
         MongoDB document ID if saved, None otherwise.
     """
-    mongodb_uri = os.getenv("MONGODB_URI")
+    mongodb_uri = get_secret("MONGODB_URI")
     if not mongodb_uri:
         return None
     
     try:
         client = MongoClient(mongodb_uri)
-        db_name = os.getenv("MONGODB_DB_NAME", "content_writer")
+        db_name = get_secret("MONGODB_DB_NAME", "content_writer")
         db = client[db_name]
         
         document = {

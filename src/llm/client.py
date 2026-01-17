@@ -12,9 +12,21 @@ from src.utils.logger import get_logger
 load_dotenv()
 logger = get_logger(__name__)
 
+def get_secret(key: str, default: Optional[str] = None) -> str:
+    """Get secret from os.getenv or st.secrets."""
+    value = os.getenv(key)
+    if value:
+        return value
+    
+    try:
+        import streamlit as st
+        return st.secrets.get(key, default)
+    except (ImportError, FileNotFoundError):
+        return default or ""
+
 # Modelos padrão
-DEFAULT_MODEL = os.getenv("MODEL_NAME", "meta-llama/Meta-Llama-3-8B-Instruct")
-JUDGE_MODEL = os.getenv("JUDGE_MODEL_NAME", "Qwen/Qwen2.5-7B-Instruct")
+DEFAULT_MODEL = get_secret("MODEL_NAME", "meta-llama/Meta-Llama-3-8B-Instruct")
+JUDGE_MODEL = get_secret("JUDGE_MODEL_NAME", "Qwen/Qwen2.5-7B-Instruct")
 
 
 class LLMClient:
@@ -44,9 +56,9 @@ class LLMClient:
         if is_judge:
             self.model_name = JUDGE_MODEL
         else:
-            self.model_name = model_name or os.getenv("MODEL_NAME", DEFAULT_MODEL)
+            self.model_name = model_name or get_secret("MODEL_NAME", DEFAULT_MODEL)
         
-        self._api_key = api_key or os.getenv("HUGGINGFACE_API_KEY", "")
+        self._api_key = api_key or get_secret("HUGGINGFACE_API_KEY", "")
 
         if not self._api_key:
             logger.warning("HUGGINGFACE_API_KEY not set. API calls may fail.")
