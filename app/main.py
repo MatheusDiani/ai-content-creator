@@ -110,6 +110,21 @@ def render_sidebar() -> None:
         use_duckduckgo = st.checkbox("DuckDuckGo", value=True)
         use_arxiv = st.checkbox("arXiv", value=False)
         
+        st.divider()
+        st.subheader("🔑 API Status")
+        
+        # Check specific keys (without showing values)
+        has_tavily = bool(get_secret("TAVILY_API_KEY"))
+        has_mongo = bool(get_secret("MONGODB_URI"))
+        has_hf = bool(get_secret("HUGGINGFACE_API_KEY"))
+        
+        st.write(f"Tavily: {'✅' if has_tavily else '❌'}")
+        st.write(f"MongoDB: {'✅' if has_mongo else '❌'}")
+        st.write(f"HuggingFace: {'✅' if has_hf else '❌'}")
+        
+        if not (has_tavily and has_mongo and has_hf):
+            st.error("Missing secrets! Check 'Manage app' > 'Settings'")
+        
         # Build list of selected researchers
         researchers = []
         if use_tavily:
