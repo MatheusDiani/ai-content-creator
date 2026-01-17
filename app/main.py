@@ -99,6 +99,10 @@ def init_session_state() -> None:
         st.session_state.is_generating = False
     if "session_id" not in st.session_state:
         st.session_state.session_id = str(uuid.uuid4())
+    if "generation_count" not in st.session_state:
+        st.session_state.generation_count = 0
+    if "last_generation_time" not in st.session_state:
+        st.session_state.last_generation_time = None
 
 
 def render_sidebar() -> None:
@@ -159,9 +163,37 @@ def render_main_content() -> None:
     
     if not researchers:
         st.warning("⚠️ Please select at least one researcher!")
+    
+    # Rate limiting constants
+    MAX_GENERATIONS = 5
+    COOLDOWN_SECONDS = 40
+    
+    # Check rate limits
+    remaining_generations = MAX_GENERATIONS - st.session_state.generation_count
+    cooldown_remaining = 0
+    
+    if st.session_state.last_generation_time:
+        elapsed = (datetime.now(timezone.utc) - st.session_state.last_generation_time).total_seconds()
+        cooldown_remaining = max(0, COOLDOWN_SECONDS - int(elapsed))
+    
+    # Show rate limit info
+    if remaining_generations <= 2 and remaining_generations > 0:
+        st.info(f"⏳ {remaining_generations} generations remaining in this session.")
+    
+    if remaining_generations <= 0:
+        st.error("🚫 You've reached the maximum of 5 generations per session. Please refresh the page to start a new session.")
+        return
+    
+    if cooldown_remaining > 0:
+        st.warning(f"⏱️ Please wait {cooldown_remaining} seconds before generating again.")
 
     # Generation process
     if generate_btn and topic and researchers:
+        # Final rate limit check
+        if cooldown_remaining > 0:
+            st.error(f"⏱️ Please wait {cooldown_remaining} seconds.")
+            return
+        
         st.session_state.is_generating = True
         st.session_state.generated_content = None
 
@@ -216,6 +248,10 @@ def render_main_content() -> None:
 
                 st.session_state.generated_content = content
                 st.session_state.is_generating = False
+                
+                # Update rate limiting counters
+                st.session_state.generation_count += 1
+                st.session_state.last_generation_time = datetime.now(timezone.utc)
                 
                 status.update(label="✅ Content generated!", state="complete")
                 
